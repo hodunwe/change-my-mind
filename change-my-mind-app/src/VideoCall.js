@@ -28,29 +28,31 @@ const VideoCall = () => {
 
       socket.emit('join-room', roomId);
 
-      socket.on('user-joined', (userId) => {
-        const peer = createPeer(userId, socket.id, stream);
+      socket.on('all-users', (users) => {
+        const peers = [];
+        users.forEach((userId) => {
+          const peer = createPeer(userId, socket.id, stream);
+          peersRef.current.push({
+            peerID: userId,
+            peer,
+          });
+          peers.push(peer);
+        });
+        setPeers(peers);
+      });
+
+      socket.on('user-joined', (payload) => {
+        const peer = addPeer(payload.signal, payload.callerID, stream);
         peersRef.current.push({
-          peerID: userId,
+          peerID: payload.callerID,
           peer,
         });
         setPeers((users) => [...users, peer]);
       });
 
-      socket.on('signal', (data) => {
-        const item = peersRef.current.find((p) => p.peerID === data.from);
-        if (item) {
-          item.peer.signal(data.signal);
-        }
-      });
-
-      socket.on('user-joined', (userId) => {
-        const peer = addPeer(userId, stream);
-        peersRef.current.push({
-          peerID: userId,
-          peer,
-        });
-        setPeers((users) => [...users, peer]);
+      socket.on('receiving-returned-signal', (payload) => {
+        const item = peersRef.current.find((p) => p.peerID === payload.id);
+        item.peer.signal(payload.signal);
       });
     });
 
@@ -67,7 +69,7 @@ const VideoCall = () => {
     });
 
     peer.on('signal', (signal) => {
-      socket.emit('signal', { signal, to: userToSignal, from: callerID });
+      socket.emit('sending-signal', { userToSignal, callerID, signal });
     });
 
     peer.on('stream', (stream) => {
@@ -90,7 +92,7 @@ const VideoCall = () => {
     });
 
     peer.on('signal', (signal) => {
-      socket.emit('signal', { signal, to: callerID, from: socket.id });
+      socket.emit('returning-signal', { signal, callerID });
     });
 
     peer.on('stream', (stream) => {
@@ -111,6 +113,9 @@ const VideoCall = () => {
     <div className="video-call">
       <div className="video-container">
         <video playsInline muted ref={myVideo} autoPlay className="my-video" />
+        {peers.map((peer, index) => (
+          <video key={index} playsInline autoPlay className="user-video" />
+        ))}
       </div>
     </div>
   );
