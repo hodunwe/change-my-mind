@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
+import './Button.css';
 
 const Logout = () => {
   const { logout } = useAuth();
 
   return (
-    <button onClick={logout}>Logout</button>
+    <button className="button" onClick={logout}>Logout</button>
   );
 };
 

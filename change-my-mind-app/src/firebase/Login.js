@@ -1,11 +1,12 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
+import './Button.css';
 
 const Login = () => {
   const { login } = useAuth();
 
   return (
-    <button onClick={login}>Login with Google</button>
+    <button className="button" onClick={login}>Login with Google</button>
   );
 };
 
