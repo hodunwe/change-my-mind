@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase/firebase';
+import { useAuth } from './firebase/AuthContext';
 import './App.css';
 
-const ChatInput = ({ onSendMessage }) => {
+const ChatInput = () => {
   const [input, setInput] = useState('');
+  const { user } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (input.trim()) {
-      onSendMessage(input);
+      await addDoc(collection(db, 'messages'), {
+        text: input,
+        user: user.displayName,
+        timestamp: serverTimestamp()
+      });
       setInput('');
     }
   };
