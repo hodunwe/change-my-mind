@@ -19,11 +19,28 @@ const UserList = () => {
   }, [findUsers]);
 
   const handleSelectUser = (user) => {
-    navigate(`/chat/${user.uid}`);
+    if (currentUser && user.uid !== currentUser.uid) {
+      navigate(`/chat/${user.uid}`);
+    }
+  };
+
+  const handleVideoCall = (user) => {
+    if (currentUser && user.uid !== currentUser.uid) {
+      navigate(`/video-call/${user.uid}`);
+    }
   };
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!currentUser) {
+    return (
+      <div>
+        <p>Please sign in to view the user list.</p>
+        <button onClick={login}>Sign In</button>
+      </div>
+    );
   }
 
   return (
@@ -31,12 +48,14 @@ const UserList = () => {
       <h2>Users</h2>
       <ul>
         {users.map(user => (
-          <li
-            key={user.uid}
-            onClick={() => handleSelectUser(user)}
-            className={currentUser && user.uid === currentUser.uid ? 'current-user' : ''}
-          >
-            {user.displayName} {currentUser && user.uid === currentUser.uid && '(You)'}
+          <li key={user.uid} className={user.uid === currentUser.uid ? 'current-user' : ''}>
+            {user.displayName} {user.uid === currentUser.uid && '(You)'}
+            {user.uid !== currentUser.uid && (
+              <>
+                <button onClick={() => handleSelectUser(user)}>Chat</button>
+                <button onClick={() => handleVideoCall(user)}>Video Call</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
