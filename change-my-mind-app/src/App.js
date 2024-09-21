@@ -1,31 +1,23 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Chat from './Chat';
-import Login from './firebase/Login';
-import Logout from './firebase/Logout';
-import { AuthProvider, useAuth } from './firebase/AuthContext';
+import ChatRoom from './firebase/ChatRoom';
+import GlobalChatRoom from './firebase/GlobalChatRoom';
+import { AuthProvider } from './firebase/AuthContext';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
-      <div className="App">
-        <AuthContent />
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Chat />} />
+          <Route path="/chat/:userId" element={<ChatRoom />} />
+          <Route path="/global-chat" element={<GlobalChatRoom />} />
+        </Routes>
+      </Router>
     </AuthProvider>
   );
 }
-
-const AuthContent = () => {
-  const { user } = useAuth();
-
-  return user ? (
-    <>
-      <Logout />
-      <Chat />
-    </>
-  ) : (
-    <Login />
-  );
-};
 
 export default App;

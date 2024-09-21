@@ -1,0 +1,14 @@
+.user-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .user-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .user-list li.current-user {
+    font-weight: bold;
+    color: blue;
+  }
